@@ -15,7 +15,6 @@ def extract_predictions(sentence):
     return list(map(lambda one_item_list: one_item_list[0], sentence[1]))
 
 if __name__ == "__main__":
-    #print(configs.ner.ner_rus_bert)
     tokenizer = RegexpTokenizer('\w+|\$[\d\.]+|\S+')
     parser = argparse.ArgumentParser()
 

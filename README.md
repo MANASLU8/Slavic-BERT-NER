@@ -45,6 +45,12 @@ python predict.py --input_file raw.txt --output_file raw.predictions.txt
 сообщает O
 Associated O
 Press O
+. O
+Соответствующее O
+решение O
+было O
+принято O
+после O
 ```
 ## Slavic BERT
 
