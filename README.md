@@ -8,6 +8,44 @@ The repository contains **Bulgarian**+**Czech**+**Polish**+**Russian** specific:
 
 Our academic paper which describes tuning Transformers for NER task in detail can be found here: https://www.aclweb.org/anthology/W19-3712/.
 
+## Make predictions for raw text
+```sh
+python predict.py --input_file raw.txt --output_file raw.predictions.txt
+```
+### File formats
+#### input
+```sh
+Суд города Нью-Йорк снял с победительницы конкурса красоты «Мисс Россия-98» Анны Маловой обвинения в подделке рецептов на наркосодержащие медицинские препараты, сообщает Associated Press. Соответствующее решение было принято после прохождения Маловой курса лечения от наркотической зависимости. Принудительное лечение было назначено «Мисс России-98» также по решению суда. Также Малова, ныне постоянно проживающая в США, обвинялась в мелкой краже, подлоге и незаконном хранении наркотиков. Более десятка правонарушений за последние три года могли обернуться для нее семью годами тюрьмы
+```
+### output
+```sh
+Суд O
+города O
+Нью Loc
+-Йорк O
+снял O
+с O
+победительницы O
+конкурса O
+красоты O
+«Мисс O
+Россия Loc
+-98» O
+Анны Per
+Маловой O
+обвинения O
+в O
+подделке O
+рецептов O
+на O
+наркосодержащие O
+медицинские O
+препараты O
+, O
+сообщает O
+Associated O
+Press O
+```
 ## Slavic BERT
 
 The Slavic model is the result of transfer from `2018_11_23/multi_cased_L-12_H-768_A-12` Multilingual BERT model to languages of Bulgarian (`bg`), Czech (`cs`), Polish (`pl`) and Russian (`ru`). The fine-tuning was performed with a stratified dataset of `bg`, `cs` and `pl` Wikipedias and `ru` news.
