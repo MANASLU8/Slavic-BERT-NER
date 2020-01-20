@@ -12,6 +12,10 @@ Our academic paper which describes tuning Transformers for NER task in detail ca
 ```sh
 python predict.py --input_file raw.txt --output_file raw.predictions.txt
 ```
+## Make predictions for tagged text
+```sh
+python predict.py --input_file ../ner-comparison/eval.tagged.txt --output_file ../ner-comparison/eval.tagged.slavic-bert.txt
+```
 ### File formats
 #### input
 ```sh
