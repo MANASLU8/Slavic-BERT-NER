@@ -56,20 +56,9 @@ def write_prediction_results(labels, tokens, output_file):
 def extract_predictions(sentence):
     return list(map(lambda one_item_list: one_item_list[0], sentence[1]))
 
-if __name__ == "__main__":
-    tokenizer = RegexpTokenizer('\w+|\$[\d\.]+|\S+')
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--input_file', type=str, default='raw.txt')
-    parser.add_argument('--output_file', type=str, default='raw.predictions.txt')
-    parser.add_argument('--model', type=str, default=MODEL_IDS['slavic'], choices=list(MODEL_IDS.values()))
-
-    args = parser.parse_args()
-
-    tokens = tokenize(args.input_file, tokenizer) if not TAGGED_MARK in args.input_file.split('/')[-1].split('.') else tokenize_tagged(args.input_file)
-
+def _predict(config_id, tokens, output_file):
     # Download and load model (set download=False to skip download phase)
-    ner = build_model(MODEL_CONFIGS[get_key(MODEL_IDS, args.model)])
+    ner = build_model(MODEL_CONFIGS[config_id])
     # if args.model == MODEL_IDS['slavic']:
     #     ner = build_model("./ner_bert_slav.json", download=True)
     # elif args.model == MODEL_IDS['rus']:
@@ -78,3 +67,33 @@ if __name__ == "__main__":
     entities = list(map(lambda sentence: extract_predictions(ner(sentence)), tokens))
 
     write_prediction_results(entities, tokens, args.output_file)
+
+if __name__ == "__main__":
+    tokenizer = RegexpTokenizer('\w+|\$[\d\.]+|\S+')
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--input_file', type=str, default='raw.txt')
+    parser.add_argument('--output_file', type=str, default='raw.predictions.txt')
+    parser.add_argument('--model', type=str, default=MODEL_IDS['slavic'], choices=list(MODEL_IDS.values()))
+    parser.add_argument('--run_all', type=bool, default=False)
+
+    args = parser.parse_args()
+
+    tokens = tokenize(args.input_file, tokenizer) if not TAGGED_MARK in args.input_file.split('/')[-1].split('.') else tokenize_tagged(args.input_file)
+
+    if not args.run_all:
+        # # Download and load model (set download=False to skip download phase)
+        # ner = build_model(MODEL_CONFIGS[get_key(MODEL_IDS, args.model)])
+        # # if args.model == MODEL_IDS['slavic']:
+        # #     ner = build_model("./ner_bert_slav.json", download=True)
+        # # elif args.model == MODEL_IDS['rus']:
+        # #     ner = build_model(configs.ner.ner_rus_bert, download=True)
+
+        # entities = list(map(lambda sentence: extract_predictions(ner(sentence)), tokens))
+
+        # write_prediction_results(entities, tokens, args.output_file)
+        _predict(get_key(MODEL_IDS, args.model), tokens, args.output_file)
+    else:
+        for config in MODEL_CONFIGS:
+            #print(config)
+            _predict(config, tokens, f'eval.tagged.{config}.txt')
