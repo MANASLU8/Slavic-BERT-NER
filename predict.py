@@ -58,7 +58,7 @@ def extract_predictions(sentence):
 
 def _predict(config_id, tokens, output_file):
     # Download and load model (set download=False to skip download phase)
-    ner = build_model(MODEL_CONFIGS[config_id])
+    ner = build_model(MODEL_CONFIGS[config_id], download = True)
     # if args.model == MODEL_IDS['slavic']:
     #     ner = build_model("./ner_bert_slav.json", download=True)
     # elif args.model == MODEL_IDS['rus']:
