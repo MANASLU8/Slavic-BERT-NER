@@ -6,7 +6,8 @@ from file_operations import write_lines
 
 TAGGED_MARK = 'tagged'
 
-PREDICTED_TAG_BODIES_MAPPING = {'LOC': 'Location', 'ORG': 'Org', 'PER': 'Person', 'O': 'O'}
+PREDICTED_TAG_BODIES_MAPPING = {'LOC': 'Location', 'ORG': 'Org', 'PER': 'Person', 'O': 'O', 'PERSON': 'Person', 
+    'GPE': 'Org', 'NORP': 'Location', 'WORK_OF_ART': 'Org'}
 DEFAULT_TAG_BODY = 'Other'
 
 MODEL_IDS = {
