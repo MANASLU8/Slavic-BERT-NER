@@ -59,7 +59,7 @@ def extract_predictions(sentence):
 
 def _predict(config_id, tokens, output_file):
     # Download and load model (set download=False to skip download phase)
-
+    print(f'Config: {MODEL_CONFIGS[config_id]}')
     ner = build_model(MODEL_CONFIGS[config_id], download = True)
 
     # if args.model == MODEL_IDS['slavic']:
@@ -79,10 +79,11 @@ if __name__ == "__main__":
     parser.add_argument('--output_file', type=str, default='raw.predictions.txt')
     parser.add_argument('--model', type=str, default=MODEL_IDS['slavic'], choices=list(MODEL_IDS.values()))
     parser.add_argument('--run_all', type=bool, default=False)
+    parser.add_argument('--tagged', action='store_true')
 
     args = parser.parse_args()
 
-    tokens = tokenize(args.input_file, tokenizer) if not TAGGED_MARK in args.input_file.split('/')[-1].split('.') else tokenize_tagged(args.input_file)
+    tokens = tokenize(args.input_file, tokenizer) if not args.tagged and not TAGGED_MARK in args.input_file.split('/')[-1].split('.') else tokenize_tagged(args.input_file)
 
     if not args.run_all:
         # # Download and load model (set download=False to skip download phase)
