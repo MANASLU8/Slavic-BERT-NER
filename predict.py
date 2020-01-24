@@ -1,8 +1,17 @@
 import argparse, os
 from deeppavlov import build_model, configs
-from converters import tokenize, tokenize_tagged, NO_ENTITY_MARK
+from converters import tokenize, tokenize_tagged, NO_ENTITY_MARK, lines_to_x_y_pairs
 from nltk.tokenize import RegexpTokenizer
-from file_operations import write_lines
+from file_operations import write_lines, read_lines, read
+
+import json
+from deeppavlov.core.trainers import NNTrainer
+from deeppavlov.core.data.data_learning_iterator import DataLearningIterator
+
+from deeppavlov.core.commands.utils import import_packages, parse_config
+
+from deeppavlov.download import deep_download
+from deeppavlov.core.common.chainer import Chainer
 
 TAGGED_MARK = 'tagged'
 
@@ -57,15 +66,47 @@ def write_prediction_results(labels, tokens, output_file):
 def extract_predictions(sentence):
     return list(map(lambda one_item_list: one_item_list[0], sentence[1]))
 
+
+def make_dataset_iterator_from_conll2003(train_file, test_file, valid_file):
+    train_pairs = lines_to_x_y_pairs(read_lines(train_file))
+    test_pairs = lines_to_x_y_pairs(read_lines(test_file))
+    valid_file = lines_to_x_y_pairs(read_lines(valid_file))
+    return DataLearningIterator({'train': train_pairs, 'test': test_pairs, 'valid': valid_file})
+
+
+def train(config_id, train_file, test_file, valid_file):
+    config = parse_config(MODEL_CONFIGS[config_id])
+    deep_download(config)
+
+    import_packages(config.get('metadata', {}).get('imports', []))
+
+    model_config = config['chainer']
+
+    model = Chainer(model_config['in'], model_config['out'], model_config.get('in_y'))
+
+    ner = NNTrainer(model_config)
+    ner._chainer = model
+
+    dataset_iterator = make_dataset_iterator_from_conll2003(train_file, test_file, valid_file)
+    ner.train(dataset_iterator)
+    return ner
+
 def _predict(config_id, tokens, output_file):
     # Download and load model (set download=False to skip download phase)
     print(f'Config: {MODEL_CONFIGS[config_id]}')
-    ner = build_model(MODEL_CONFIGS[config_id], download = True)
+    #ner = build_model(MODEL_CONFIGS[config_id], download = True)
 
     # if args.model == MODEL_IDS['slavic']:
     #     ner = build_model("./ner_bert_slav.json", download=True)
     # elif args.model == MODEL_IDS['rus']:
     #     ner = build_model(configs.ner.ner_rus_bert, download=True)
+
+    #print(dir(ner))
+
+    with open(MODEL_CONFIGS[config_id]) as file:
+        ner = NNTrainer(json.load(file)["chainer"])
+
+    dd
 
     entities = list(map(lambda sentence: extract_predictions(ner(sentence)), tokens))
 
@@ -80,6 +121,10 @@ if __name__ == "__main__":
     parser.add_argument('--model', type=str, default=MODEL_IDS['slavic'], choices=list(MODEL_IDS.values()))
     parser.add_argument('--run_all', type=bool, default=False)
     parser.add_argument('--tagged', action='store_true')
+
+    parser.add_argument('--train', type=str)
+    parser.add_argument('--test', type=str)
+    parser.add_argument('--valid', type=str)
 
     args = parser.parse_args()
 
@@ -96,6 +141,8 @@ if __name__ == "__main__":
         # entities = list(map(lambda sentence: extract_predictions(ner(sentence)), tokens))
 
         # write_prediction_results(entities, tokens, args.output_file)
+        train(get_key(MODEL_IDS, args.model), args.train, args.test, args.valid)
+        print('predicting...')
         _predict(get_key(MODEL_IDS, args.model), tokens, args.output_file)
     else:
         for config in MODEL_CONFIGS:

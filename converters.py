@@ -18,3 +18,10 @@ def tokenize_tagged(input_file):
     if len(sentence_tokens) > 0:
         sentences.append(sentence_tokens)
     return sentences
+
+def lines_to_x_y_pairs(lines):
+    pairs = []
+    for line in list(map(lambda line: line.split(' '), lines))[2:]:
+        if len(line) >= 2:
+            pairs.append((line[0], line[-1]))
+    return pairs
