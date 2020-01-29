@@ -1,17 +1,28 @@
 import argparse, os
 from deeppavlov import build_model, configs
+from deeppavlov import train_evaluate_model_from_config
 from converters import tokenize, tokenize_tagged, NO_ENTITY_MARK, lines_to_x_y_pairs
 from nltk.tokenize import RegexpTokenizer
 from file_operations import write_lines, read_lines, read
-
+import tensorflow as tf
 import json
 from deeppavlov.core.trainers import NNTrainer
 from deeppavlov.core.data.data_learning_iterator import DataLearningIterator
-
+from keras.backend.tensorflow_backend import set_session
 from deeppavlov.core.commands.utils import import_packages, parse_config
 
 from deeppavlov.download import deep_download
 from deeppavlov.core.common.chainer import Chainer
+
+config = tf.ConfigProto()
+
+config.gpu_options.allow_growth = True # dynamically grow the memory used on the GPU
+
+config.log_device_placement = True
+
+sess = tf.Session(config=config)
+
+set_session(sess)
 
 TAGGED_MARK = 'tagged'
 
@@ -67,29 +78,29 @@ def extract_predictions(sentence):
     return list(map(lambda one_item_list: one_item_list[0], sentence[1]))
 
 
-def make_dataset_iterator_from_conll2003(train_file, test_file, valid_file):
-    train_pairs = lines_to_x_y_pairs(read_lines(train_file))
-    test_pairs = lines_to_x_y_pairs(read_lines(test_file))
-    valid_file = lines_to_x_y_pairs(read_lines(valid_file))
+def make_dataset_iterator_from_conll2003(train_file, test_file, valid_file, config_id):
+    train_pairs = lines_to_x_y_pairs(read_lines(train_file), config_id)
+    test_pairs = lines_to_x_y_pairs(read_lines(test_file), config_id)
+    valid_file = lines_to_x_y_pairs(read_lines(valid_file), config_id)
     return DataLearningIterator({'train': train_pairs, 'test': test_pairs, 'valid': valid_file})
 
 
 def train(config_id, train_file, test_file, valid_file):
-    config = parse_config(MODEL_CONFIGS[config_id])
-    deep_download(config)
+    # config = parse_config(MODEL_CONFIGS[config_id])
+    # deep_download(config)
 
-    import_packages(config.get('metadata', {}).get('imports', []))
+    # import_packages(config.get('metadata', {}).get('imports', []))
 
-    model_config = config['chainer']
+    # model_config = config['chainer']
 
-    model = Chainer(model_config['in'], model_config['out'], model_config.get('in_y'))
+    # model = Chainer(model_config['in'], model_config['out'], model_config.get('in_y'))
 
-    ner = NNTrainer(model_config)
-    ner._chainer = model
-
-    dataset_iterator = make_dataset_iterator_from_conll2003(train_file, test_file, valid_file)
-    ner.train(dataset_iterator)
-    return ner
+    # ner = NNTrainer(model_config)
+    # ner._chainer = model
+    print(MODEL_CONFIGS[config_id])
+    dataset_iterator = make_dataset_iterator_from_conll2003(train_file, test_file, valid_file, config_id)
+    #ner.train(dataset_iterator)
+    return train_evaluate_model_from_config(MODEL_CONFIGS[config_id], dataset_iterator)
 
 def _predict(model, tokens, output_file):
     # Download and load model (set download=False to skip download phase)
