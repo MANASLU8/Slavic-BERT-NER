@@ -100,7 +100,7 @@ def train(config_id, train_file, test_file, valid_file):
     print(MODEL_CONFIGS[config_id])
     dataset_iterator = make_dataset_iterator_from_conll2003(train_file, test_file, valid_file, config_id)
     #ner.train(dataset_iterator)
-    return train_evaluate_model_from_config(MODEL_CONFIGS[config_id], dataset_iterator)
+    return train_evaluate_model_from_config(MODEL_CONFIGS[config_id], dataset_iterator, download = True)
 
 def _predict(model, tokens, output_file):
     # Download and load model (set download=False to skip download phase)
