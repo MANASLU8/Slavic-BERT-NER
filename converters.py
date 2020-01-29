@@ -34,14 +34,14 @@ def tokenize_tagged(input_file):
 def translate_tag_body(tag, mapping):
     splitted_tag = tag.split('-')
     if len(splitted_tag) < 2:
-        return splitted_tag
+        return [splitted_tag[0]]
     else:
-        return f'{splitted_tag[0]}_{mapping.get(splitted_tag[1], splitted_tag[1])}'
+        return [f'{splitted_tag[0]}_{mapping.get(splitted_tag[1], splitted_tag[1])}']
 
 
 def lines_to_x_y_pairs(lines, config_id):
     pairs = []
     for line in list(map(lambda line: line.split(' '), lines))[2:]:
         if len(line) >= 2:
-            pairs.append((line[0],  translate_tag_body(line[-1], LABEL_MAPPINGS[config_id])))
+            pairs.append((line[0], translate_tag_body(line[-1], LABEL_MAPPINGS[config_id])))
     return pairs

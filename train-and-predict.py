@@ -81,8 +81,11 @@ def extract_predictions(sentence):
 def make_dataset_iterator_from_conll2003(train_file, test_file, valid_file, config_id):
     train_pairs = lines_to_x_y_pairs(read_lines(train_file), config_id)
     test_pairs = lines_to_x_y_pairs(read_lines(test_file), config_id)
-    valid_file = lines_to_x_y_pairs(read_lines(valid_file), config_id)
-    return DataLearningIterator({'train': train_pairs, 'test': test_pairs, 'valid': valid_file})
+    valid_pairs = lines_to_x_y_pairs(read_lines(valid_file), config_id)
+    print(train_pairs[:100])
+    print(test_pairs[:100])
+    print(valid_pairs[:100])
+    return DataLearningIterator({'train': train_pairs, 'test': test_pairs, 'valid': valid_pairs})
 
 
 def train(config_id, train_file, test_file, valid_file):
