@@ -10,6 +10,7 @@ Our academic paper which describes tuning Transformers for NER task in detail ca
 ## Installing dependencies
 ```sh
 pip install deeppavlov
+pip install squad_bert
 pip install pybind11==2.2.3 git+https://github.com/deepmipt/fastText.git#egg=fastText==0.8.22
 pip install tensorflow-gpu==1.15
 ```
