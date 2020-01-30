@@ -85,25 +85,45 @@ def make_dataset_iterator_from_conll2003(train_file, test_file, valid_file, conf
     print(train_pairs[:100])
     print(test_pairs[:100])
     print(valid_pairs[:100])
-    return DataLearningIterator({'train': train_pairs, 'test': test_pairs, 'valid': valid_pairs})
+    return DataLearningIterator({'train': train_pairs, 'test': test_pairs, 'valid': valid_pairs}, shuffle=False)
 
 
 def train(config_id, train_file, test_file, valid_file):
-    # config = parse_config(MODEL_CONFIGS[config_id])
-    # deep_download(config)
-
-    # import_packages(config.get('metadata', {}).get('imports', []))
-
-    # model_config = config['chainer']
-
-    # model = Chainer(model_config['in'], model_config['out'], model_config.get('in_y'))
-
-    # ner = NNTrainer(model_config)
-    # ner._chainer = model
+    config = parse_config(MODEL_CONFIGS[config_id])
     print(MODEL_CONFIGS[config_id])
+    deep_download(config)
+
+    import_packages(config.get('metadata', {}).get('imports', []))
+
+    model_config = config['chainer']
+
+    model = Chainer(model_config['in'], model_config['out'], model_config.get('in_y'))
+
+    ner = NNTrainer(model_config,
+         batch_size = config['train']['epochs'],
+         epochs =  config['train']['batch_size'],
+         start_epoch_num = 0,
+         metrics = config['train']['metrics'],
+         train_metrics =  config['train']['metrics'],
+         metric_optimization = 'maximize',
+         evaluation_targets = config['train']['evaluation_targets'],
+         validation_patience = config['train']['validation_patience'],
+         val_every_n_batches = config['train']['val_every_n_epochs'],
+         #log_every_n_batches = config['train']['log_every_n_batches'],
+         show_examples = config['train']['show_examples'])
+    ner._chainer = build_model(MODEL_CONFIGS[config_id], download = True)
+
     dataset_iterator = make_dataset_iterator_from_conll2003(train_file, test_file, valid_file, config_id)
-    #ner.train(dataset_iterator)
-    return train_evaluate_model_from_config(MODEL_CONFIGS[config_id], dataset_iterator, download = True)
+    ner.train(dataset_iterator)
+
+    return ner._chainer
+
+    # use default train command
+
+    # print(MODEL_CONFIGS[config_id])
+    # dataset_iterator = make_dataset_iterator_from_conll2003(train_file, test_file, valid_file, config_id)
+    # #ner.train(dataset_iterator)
+    # return train_evaluate_model_from_config(MODEL_CONFIGS[config_id], dataset_iterator, download = True)
 
 def _predict(model, tokens, output_file):
     # Download and load model (set download=False to skip download phase)

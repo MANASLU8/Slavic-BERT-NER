@@ -7,7 +7,12 @@ The repository contains **Bulgarian**+**Czech**+**Polish**+**Russian** specific:
 - [NER model (`PER`, `LOC`, `ORG`, `PRO`, `EVT`)](#slavic-bert)
 
 Our academic paper which describes tuning Transformers for NER task in detail can be found here: https://www.aclweb.org/anthology/W19-3712/.
-
+## Installing dependencies
+```sh
+pip install deeppavlov
+pip install pybind11==2.2.3 git+https://github.com/deepmipt/fastText.git#egg=fastText==0.8.22
+pip install tensorflow-gpu==1.15
+```
 ## Make predictions for raw text
 ```sh
 python predict.py --input raw.txt --output raw.predictions.txt
@@ -60,6 +65,10 @@ Press O
 принято O
 после O
 ```
+## Project structure highlights
+- script `cv_to_conll2003.sh` contains code for converting dataset presented in format of files from the folder `rucv` to the conll2003 format supported by deeppavlov for training and tasting from the console. The outcome is saved in the folder `cv` with similar folder structure.
+- directory `custom_configs` contains configs which completely repeat content of the original default model configs from deeppavlov package, but are linked to another datasets for training, testing and validation. Example of applying these configs:
+`python -m deeppavlov train custom-configs/ner_rus_bert.json`
 ## Slavic BERT
 
 The Slavic model is the result of transfer from `2018_11_23/multi_cased_L-12_H-768_A-12` Multilingual BERT model to languages of Bulgarian (`bg`), Czech (`cs`), Polish (`pl`) and Russian (`ru`). The fine-tuning was performed with a stratified dataset of `bg`, `cs` and `pl` Wikipedias and `ru` news.
