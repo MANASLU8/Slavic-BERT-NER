@@ -9,7 +9,7 @@ LD_LIBRARY_PATH=/usr/local/cuda/lib64
 for model in ner_ontonotes_bert
 do
 	mkdir -p $NER_COMPARISON_HOME/cv-ner-ontonotes-bert-with-fine-tuning/$model
-	for i in $(seq -f "%02g" 1 $NUMBER_OF_FOLDS)
+	for i in $(seq -f "%02g" 1 1) #$NUMBER_OF_FOLDS)
 	do
 		rm -rf ~/.deeppavlov/models/$model
 		python -m deeppavlov train custom-configs/$model/$model-$i.json
@@ -18,3 +18,5 @@ do
 done
 
 deactivate
+
+#python -m deeppavlov train custom-configs/ner_ontonotes_bert/ner_ontonotes_bert-01.json

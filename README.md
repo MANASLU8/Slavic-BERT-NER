@@ -10,7 +10,7 @@ Our academic paper which describes tuning Transformers for NER task in detail ca
 ## Installing dependencies
 ```sh
 pip install deeppavlov
-pip install squad_bert
+python -m deeppavlov install squad_bert
 pip install pybind11==2.2.3 git+https://github.com/deepmipt/fastText.git#egg=fastText==0.8.22
 pip install tensorflow-gpu==1.15
 ```
@@ -78,6 +78,11 @@ cp -r ~/fact-ru-eval2stanford/conll2003rucv/* rucv
 ./set_up_configs.sh
 ./run-models-cv-rus-ner-bert-with-training.sh
 ```
+## Training and testing in one script
+Execute the `predict-with-training.py` script, training config is given using `--config` cmd argument. Example of both - prediction with training and prediction without training are given in file `run-last-bert-prediction.sh`.
+## Cv datasets
+- cv - contains 7 tags - one for `O` two per `PER` (person), `LOC` (location), `ORG` (organisation) - suits for `ner_rus_bert`
+- cvo - in addition to tags from cv contains `EVT` (event), `PRO` (product), suits for slavic bert
 ## Slavic BERT
 
 The Slavic model is the result of transfer from `2018_11_23/multi_cased_L-12_H-768_A-12` Multilingual BERT model to languages of Bulgarian (`bg`), Czech (`cs`), Polish (`pl`) and Russian (`ru`). The fine-tuning was performed with a stratified dataset of `bg`, `cs` and `pl` Wikipedias and `ru` news.
